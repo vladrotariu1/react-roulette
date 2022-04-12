@@ -1,0 +1,42 @@
+.slots-container-viewport {
+    align-items: center;
+    background-color: gray;
+    display: flex;
+    flex-wrap: nowrap;
+    height: 120px;
+    justify-content: center;
+    margin: auto;
+    overflow: hidden;
+    position: relative;
+    width: 70%;
+}
+
+.slots-container-viewport::after {
+    background-color: aqua;
+    content: '';
+    height: 100%;
+    position: absolute;
+    width: 2px;
+}
+
+.slots-container {
+    display: flex;
+    height: 100px;
+    position: absolute;
+    width: fit-content;
+}
+
+.slot {
+    color: #fafafa;
+    font-size: 32px;
+    height: 100px;
+    width: 100px;
+}
+
+.slot-red {
+    background-color: rgb(216, 17, 17);
+}
+
+.slot-black {
+    background-color: rgb(0, 0, 0);
+}
