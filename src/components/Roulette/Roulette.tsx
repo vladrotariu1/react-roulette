@@ -1,27 +1,41 @@
-import React, { useState, useRef, useEffect } from "react";
-import { SLOTS_NUMBER, SLOTS_PX_WIDTH, SLOTS_ROLL_ACCELERATION, SLOTS_ROLL_FRICTION } from "../../utils/constants";
+import React, { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
+import { 
+    SLOTS_MAX_SPEED, 
+    SLOTS_NUMBER, 
+    SLOTS_PX_WIDTH, 
+    SLOTS_ROLL_ACCELERATION, 
+    SLOTS_ROLL_FRICTION, 
+    SLOTS_VIEWPORT_PX_WIDTH, 
+    SLOT_COLOR_BLACK, 
+    SLOT_COLOR_RED } from "../../utils/constants";
 import './Roulette.css';
 
 interface RouletteProps {
-    buttonClick: number
+    buttonClick: number,
+    setWinnerSlotColor: Dispatch<SetStateAction<string>>
 }
 
 function Roulette(props: RouletteProps) {
 
-    let slotsArray = [];
     let slotsRef = useRef<any>();
+    const [ slotsArrayData, setSlotsArrayData ] = useState(
+        [...Array(SLOTS_NUMBER).keys()]
+            .map(index => 
+                <div 
+                    key={ index }
+                    color={ index % 2 === 0 ? SLOT_COLOR_RED : SLOT_COLOR_BLACK }
+                    className={ 'slot ' + (index % 2 === 0 ? 'slot-red' : 'slot-black') }>
+                    { index }
+                </div>
+            )
+    );
 
-    for (let i = 0; i < SLOTS_NUMBER; i++) {
-        slotsArray.push(
-            <div 
-                key={i}
-                className={ 'slot ' + (i % 2 === 0 ? 'slot-red' : 'slot-black') }>
-                    {i}
-            </div>
-        );
+    const slotsRollResult = (): string => {
+        const offsetLeft = slotsRef.current.offsetLeft;
+        const slotIndex = Math.floor(((SLOTS_VIEWPORT_PX_WIDTH / 2) - offsetLeft) / SLOTS_PX_WIDTH);
+
+        return slotsRef.current.children[slotIndex].getAttribute('color');
     }
-
-    const [ slotsArrayData, setSlotsArrayData ] = useState(slotsArray);
 
     const moveLastSlotToFront = () => {
         
@@ -42,10 +56,11 @@ function Roulette(props: RouletteProps) {
         let velocity = 0;
         const acceleration = SLOTS_ROLL_ACCELERATION;
         let friction = SLOTS_ROLL_FRICTION;
-        let accelerationTime = 300;
+        let accelerationTime = 200;
         let time = 0;
         
         const stopAnimation = () => {
+            props.setWinnerSlotColor(val => slotsRollResult());
             clearInterval(rollAnimation);
         }
         
@@ -54,12 +69,13 @@ function Roulette(props: RouletteProps) {
             const offsetLeft = slotsContainer.offsetLeft;
 
             if (time++ < accelerationTime) {
-                velocity += acceleration;
+                velocity += velocity < SLOTS_MAX_SPEED ?  acceleration : 0;
                 slotsContainer.style.left = offsetLeft + velocity + 'px';
             }
             else if(velocity > 0.1) {
-                velocity *= friction
-                friction -= 0.0001;
+                velocity *= friction;
+                friction -= 0.00006;
+                if (velocity < 3) friction -= 0.0006
                 slotsContainer.style.left = offsetLeft + velocity + 'px';
             }
             else {
