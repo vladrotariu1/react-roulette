@@ -5,10 +5,9 @@
     flex-wrap: nowrap;
     height: 120px;
     justify-content: center;
-    margin: auto;
     overflow: hidden;
     position: relative;
-    width: 70%;
+    width: 1000px;
 }
 
 .slots-container-viewport::after {
