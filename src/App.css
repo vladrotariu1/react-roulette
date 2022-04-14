@@ -1,11 +1,14 @@
 .roulette-wrapper {
+    align-items: center;
     display: flex;
+    flex-direction: column;
     justify-content: center;
 }
 
 .winner-slot-color {
     font-family: sans-serif;
-    font-size: 32px;
+    font-size: 72px;
+    justify-content: center;
 }
 
 .winner-slot-red {

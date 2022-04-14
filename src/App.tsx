@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import './App.css';
 import Roulette from './components/Roulette/Roulette';
+import TimeCountdown from './components/Time-Countdown/Time-Countdown';
 import { SLOT_COLOR_RED } from './utils/constants';
 
 function App() {
+
+  console.log('here');
 
   const [ buttonClickData, setButtonClickData ] = useState(0);
   const [ winnerSlotColorData, setWinnerSlotColorData ] = useState('Color');
@@ -13,13 +16,13 @@ function App() {
   }
 
   return (
-    <div>
+    <div className='roulette-wrapper'>
 
-      <div className='roulette-wrapper'>
-        <Roulette 
-          setWinnerSlotColor={ setWinnerSlotColorData } 
-          buttonClick={ buttonClickData } />
-      </div>
+      <TimeCountdown />
+
+      <Roulette 
+        setWinnerSlotColor={ setWinnerSlotColorData } 
+        buttonClick={ buttonClickData } />
 
       <div 
         className={ 
@@ -27,10 +30,9 @@ function App() {
           (winnerSlotColorData === SLOT_COLOR_RED ? 'winner-slot-red' : 'winner-slot-black')
         }>
         { winnerSlotColorData.toUpperCase() }
-      </div>
+      </div>  
 
       <button onClick={ handleRoll }>Roll</button>
-
     </div>
   );
 }
