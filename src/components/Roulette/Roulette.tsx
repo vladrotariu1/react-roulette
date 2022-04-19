@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
 import { 
+    Modes,
     SLOTS_MAX_SPEED, 
     SLOTS_NUMBER, 
     SLOTS_PX_WIDTH, 
@@ -11,8 +12,9 @@ import {
 import './Roulette.css';
 
 interface RouletteProps {
-    buttonClick: number,
-    setWinnerSlotColor: Dispatch<SetStateAction<string>>
+    shouldRollOrCountDown: Modes,
+    setWinnerSlotColor: Dispatch<SetStateAction<string>>,
+    setModeToCountDown: () => void
 }
 
 function Roulette(props: RouletteProps) {
@@ -30,14 +32,14 @@ function Roulette(props: RouletteProps) {
             )
     );
 
-    const slotsRollResult = (): string => {
+    function slotsRollResult(): string {
         const offsetLeft = slotsRef.current.offsetLeft;
         const slotIndex = Math.floor(((SLOTS_VIEWPORT_PX_WIDTH / 2) - offsetLeft) / SLOTS_PX_WIDTH);
 
         return slotsRef.current.children[slotIndex].getAttribute('color');
     }
 
-    const moveLastSlotToFront = () => {
+    function moveLastSlotToFront() {
         
         const slotsContainer = slotsRef.current;
         const offsetLeft = slotsContainer.offsetLeft;
@@ -49,7 +51,7 @@ function Roulette(props: RouletteProps) {
         );
     }
 
-    const roll = () => {
+    function roll() {
 
         const slotsContainer = slotsRef.current;
 
@@ -61,6 +63,7 @@ function Roulette(props: RouletteProps) {
         
         const stopAnimation = () => {
             props.setWinnerSlotColor(val => slotsRollResult());
+            props.setModeToCountDown();
             clearInterval(rollAnimation);
         }
         
@@ -89,7 +92,11 @@ function Roulette(props: RouletteProps) {
         }, 1);
     }
 
-    useEffect(roll, [props.buttonClick]);
+    useEffect(() => {
+        if (props.shouldRollOrCountDown === Modes.MODE_ROLL) {
+            roll();
+        }
+    }, [props.shouldRollOrCountDown]);
 
     return (
         <div>
