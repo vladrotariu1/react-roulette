@@ -1,0 +1,28 @@
+.input-container {
+    margin: 16px 0px;
+}
+
+.input {
+    background-color: transparent;
+    border-color: #fafafa;
+    border-style: none none solid none;
+    color: #fafafa;
+    font-size: 20px;
+    font-family: inherit;
+    padding: 0px 0px 8px 8px;
+}
+
+.input:focus-visible {
+    outline: none;
+}
+
+.input-invalid {
+    border-color: rgb(163, 50, 50);
+}
+
+.input-error {
+    color: rgb(163, 50, 50);
+    font-size: 12px;
+    margin: 8px 0px;
+    height: 12px;
+}

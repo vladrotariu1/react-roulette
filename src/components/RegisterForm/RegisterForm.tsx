@@ -1,47 +1,79 @@
-import React, { ChangeEvent, SetStateAction, SyntheticEvent, useEffect, useState } from "react";
-import { FormInputDataModel } from "../../models";
-import { AtLeastNChars, EmailValidator, handleInputOnChange } from "../../utils/FormsValidation";
+import React, { SyntheticEvent, useState } from "react";
+import { FormInputDataModel, FormInputModel } from "../../models";
+import { AtLeastNChars, EmailValidator } from "../../utils/FormsValidation";
+import FormInput from "../FormInput/FormInput";
 import "./RegisterForm.css";
 
 function RegisterForm() {
 
-    const [emailData, setEmailData] = useState( new FormInputDataModel() );
-    const [passwordData, setPasswordData] = useState( new FormInputDataModel() );
-    const [passwordCheckData, setPasswordCheckData] = useState( new FormInputDataModel() );
+    const form = {
+        email: 
+        new FormInputModel(
+            ...useState(new FormInputDataModel()), 
+            'Email',
+            'text',
+            [new EmailValidator()]
+        ),
+        password: 
+        new FormInputModel(
+            ...useState(new FormInputDataModel()), 
+            'Password',
+            'password',
+            [new AtLeastNChars(8)]
+        ),
+        checkPassword: 
+        new FormInputModel(
+            ...useState(new FormInputDataModel()), 
+            'Password check',
+            'password'
+        )
+    };
+
+    const [formGlobalErrorData, setFormGlobalErrorData] = useState('');
 
     function readyToSumbit(): boolean {
-        return (
-            !(emailData.error || passwordData.error || passwordCheckData.error) &&
-            !!(emailData.inputValue && passwordData.inputValue && passwordCheckData.inputValue)
-        );
+        let noErrors = true;
+        let hasData = true;
+
+        Object.values(form).forEach(input => {
+            noErrors &&= !input.data.error;
+            hasData &&= !!input.data.inputValue;
+        });
+
+        return noErrors && hasData;
     }
 
     function resetForm() {
-        setEmailData(new FormInputDataModel());
-        setPasswordData(new FormInputDataModel());
-        setPasswordCheckData(new FormInputDataModel());
+        Object.values(form).forEach(input => {
+            input.setData({ inputValue: '', error: '' });
+        })
+    }
+
+    function passwordsMatch() {
+        return (
+            form.password.data.inputValue === 
+            form.checkPassword.data.inputValue
+        );
     }
 
     function submit(e: SyntheticEvent) {
         e.preventDefault();
 
-        const email = emailData.inputValue;
-        const password = passwordData.inputValue;
-        const passwordCheck = passwordCheckData.inputValue;
-
-        if (password !== passwordCheck) {
-            setPasswordCheckData({ ...passwordCheckData, error: 'Passwords do not match' });
+        if (!passwordsMatch()) {
+            setFormGlobalErrorData('Passwords do not match');
             return;
         }
 
+        setFormGlobalErrorData('');
+
         const userDataPayload = {
-            email: email,
-            password: password,
+            email: form.email.data.inputValue,
+            password: form.password.data.inputValue
         };
 
-        resetForm();
-
         console.log(userDataPayload);
+
+        resetForm();
     }
 
     return (
@@ -51,40 +83,14 @@ function RegisterForm() {
 
             <form className='register-form' onSubmit={ submit }>
 
-                <div className='register-form-input-container'>
-                    <input 
-                        className={
-                            'register-form-input ' +
-                            (emailData.error ? 'register-form-input-invalid' : '')
-                        }
-                        placeholder='Email'
-                        type='text' 
-                        onChange={ e => handleInputOnChange(e, setEmailData, [new EmailValidator()]) }/>
-                    <div className='register-form-input-error'>{ emailData.error }</div>
-                </div>
+                { 
+                    Object.values(form).map((inputField, i) => {
+                        return <FormInput key={ i } model={ inputField } />
+                    })
+                }
 
-                <div className='register-form-input-container'>
-                    <input 
-                        className={
-                            'register-form-input ' +
-                            (passwordData.error ? 'register-form-input-invalid' : '')
-                        }
-                        placeholder='Password' 
-                        type='password'  
-                        onChange={ e => handleInputOnChange(e, setPasswordData, [new AtLeastNChars(8)]) }/>
-                    <div className='register-form-input-error'>{ passwordData.error }</div>
-                </div>
-
-                <div className='register-form-input-container'>
-                    <input 
-                        className={
-                            'register-form-input ' +
-                            (passwordCheckData.error ? 'register-form-input-invalid' : '')
-                        }
-                        placeholder='Password again' 
-                        type='password'  
-                        onChange={ e => handleInputOnChange(e, setPasswordCheckData) }/>
-                    <div className='register-form-input-error'>{ passwordCheckData.error }</div>
+                <div className='register-form-global-error'>
+                    { formGlobalErrorData }
                 </div>
 
                 <button disabled={ !readyToSumbit() } className='register-form-submit' type="submit">Sign up</button>

@@ -19,29 +19,7 @@
     padding: 0px 24px;
 }
 
-.register-form-input-container {
-    margin: 16px 0px;
-}
-
-.register-form-input {
-    background-color: transparent;
-    border-color: #fafafa;
-    border-style: none none solid none;
-    color: #fafafa;
-    font-size: 20px;
-    font-family: inherit;
-    padding: 0px 0px 8px 8px;
-}
-
-.register-form-input:focus-visible {
-    outline: none;
-}
-
-.register-form-input-invalid {
-    border-color: rgb(163, 50, 50);
-}
-
-.register-form-input-error {
+.register-form-global-error {
     color: rgb(163, 50, 50);
     font-size: 12px;
     margin: 8px 0px;
