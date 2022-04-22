@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { TimeCountdownProps } from "../../models";
 import { COUNTDOWN_TIME, Modes } from "../../utils/constants";
-import './Time-Countdown.css'
+import './TimeCountdown.css'
 
-interface TimeCountdownInterface {
-    shouldRollOrCountDown: Modes,
-    setModeToRoll: () => void
-}
-
-function TimeCountdown(props: TimeCountdownInterface) {
+function TimeCountdown(props: TimeCountdownProps) {
 
     const [timeData, setTimeData] = useState(COUNTDOWN_TIME);
 

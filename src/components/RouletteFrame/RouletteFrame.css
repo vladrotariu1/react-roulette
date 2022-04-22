@@ -1,0 +1,19 @@
+.roulette-frame {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.winner-slot-color {
+    font-size: 72px;
+    justify-content: center;
+}
+
+.winner-slot-red {
+    color: rgb(216, 17, 17);
+}
+
+.winner-slot-black {
+    color: rgb(0, 0, 0);
+}

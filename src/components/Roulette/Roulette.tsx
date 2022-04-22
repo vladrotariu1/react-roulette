@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { RouletteProps } from "../../models";
 import { 
     Modes,
     SLOTS_MAX_SPEED, 
@@ -10,12 +11,6 @@ import {
     SLOT_COLOR_BLACK, 
     SLOT_COLOR_RED } from "../../utils/constants";
 import './Roulette.css';
-
-interface RouletteProps {
-    shouldRollOrCountDown: Modes,
-    setWinnerSlotColor: Dispatch<SetStateAction<string>>,
-    setModeToCountDown: () => void
-}
 
 function Roulette(props: RouletteProps) {
 

@@ -1,5 +1,6 @@
 
 body {
-  margin: 0;
   background-color: rgb(31, 31, 31);
+  font-family: sans-serif;
+  margin: 0;
 }
