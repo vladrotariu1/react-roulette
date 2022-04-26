@@ -1,10 +1,15 @@
 import React, { SyntheticEvent, useState } from "react";
-import { FormInputDataModel, FormInputModel } from "../../models";
+import { useNavigate } from "react-router-dom";
+import { FormInputDataModel, FormInputModel, UserModel } from "../../models";
+import { useCreateUser } from "../../services/auth.service";
 import { AtLeastNChars, EmailValidator } from "../../utils/FormsValidation";
 import FormInput from "../FormInput/FormInput";
 import "./RegisterForm.css";
 
 function RegisterForm() {
+    const navigator = useNavigate();
+
+    const { mutate: createUser } = useCreateUser();
 
     const form = {
         email: 
@@ -46,7 +51,7 @@ function RegisterForm() {
     function resetForm() {
         Object.values(form).forEach(input => {
             input.setData({ inputValue: '', error: '' });
-        })
+        });
     }
 
     function passwordsMatch() {
@@ -66,12 +71,16 @@ function RegisterForm() {
 
         setFormGlobalErrorData('');
 
-        const userDataPayload = {
+        const userDataPayload: UserModel = {
             email: form.email.data.inputValue,
             password: form.password.data.inputValue
         };
 
-        console.log(userDataPayload);
+        createUser(userDataPayload, {
+                onError: (error: any) => setFormGlobalErrorData(error.message),
+                onSuccess: (data) => navigator('/login')
+            }
+        );
 
         resetForm();
     }

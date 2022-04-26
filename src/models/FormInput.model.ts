@@ -1,6 +1,6 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { FormsValidator, handleInputOnChange } from "../utils/FormsValidation";
-import { FormInputDataModel } from "./FormInputDataModel";
+import { FormInputDataModel } from "./FormInputData.model";
 
 export class FormInputModel {
     constructor(
