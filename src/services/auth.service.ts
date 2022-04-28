@@ -31,3 +31,32 @@ export function useCreateUser() {
         (newUser: UserModel) => executeRequest(newUser)
     );
 }
+
+export function useLoginUser() {
+    const loginUserEndpoint = endpoint + 'signin/';
+    const request = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+            //'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    }
+
+    const executeRequest = (user: UserModel) =>
+        fetch(loginUserEndpoint, {...request, body: JSON.stringify(user)})
+            .then(response => {
+                if (!response.ok) {
+                    switch(response.status) {
+                        case 403:
+                            throw Error('Invalid credentials');
+                        default:
+                            throw Error(response.statusText);
+                    }
+                }
+                return response;
+            });
+
+    return useMutation(
+        (user: UserModel) => executeRequest(user)
+    );
+}

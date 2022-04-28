@@ -17,16 +17,20 @@ export function handleInputOnChange(
         });
     }
 
+    let errorMessages: string[] = [];
+
     if (validators) {
         validators.forEach(validator => {
             try {
-                if (validator.validate(e)) 
-                    callCallback({ inputValue: e.target.value, error: '' });
+                validator.validate(e)
             } catch (error: any) {
-                callCallback({ inputValue: e.target.value, error: error.message });
+                errorMessages.push(error.message);
             }
         });
-    } else {
-        callCallback({ inputValue: e.target.value, error: '' });
     }
+
+    callCallback({ 
+        inputValue: e.target.value, 
+        error: errorMessages.length > 0 ? errorMessages[0] :  ''
+    });
 }

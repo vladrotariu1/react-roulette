@@ -3,3 +3,4 @@ export * from './TimeCountdown.props.model';
 export * from './FormInputData.model';
 export * from './FormInput.model';
 export * from './User.model';
+export * from './Form.props.model';

@@ -1,9 +1,9 @@
-import React, { SyntheticEvent, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FormInputDataModel, FormInputModel, UserModel } from "../../models";
 import { useCreateUser } from "../../services/auth.service";
-import { AtLeastNChars, EmailValidator } from "../../utils/FormsValidation";
-import FormInput from "../FormInput/FormInput";
+import { AtLeastNChars, EmailValidator, NotEmpty } from "../../utils/FormsValidation";
+import Form from "../Form/Form";
 import "./RegisterForm.css";
 
 function RegisterForm() {
@@ -17,42 +17,25 @@ function RegisterForm() {
             ...useState(new FormInputDataModel()), 
             'Email',
             'text',
-            [new EmailValidator()]
+            [new NotEmpty(), new EmailValidator()]
         ),
         password: 
         new FormInputModel(
             ...useState(new FormInputDataModel()), 
             'Password',
             'password',
-            [new AtLeastNChars(8)]
+            [new NotEmpty(), new AtLeastNChars(8)]
         ),
         checkPassword: 
         new FormInputModel(
             ...useState(new FormInputDataModel()), 
             'Password check',
-            'password'
+            'password',
+            [new NotEmpty()]
         )
     };
 
     const [formGlobalErrorData, setFormGlobalErrorData] = useState('');
-
-    function readyToSumbit(): boolean {
-        let noErrors = true;
-        let hasData = true;
-
-        Object.values(form).forEach(input => {
-            noErrors &&= !input.data.error;
-            hasData &&= !!input.data.inputValue;
-        });
-
-        return noErrors && hasData;
-    }
-
-    function resetForm() {
-        Object.values(form).forEach(input => {
-            input.setData({ inputValue: '', error: '' });
-        });
-    }
 
     function passwordsMatch() {
         return (
@@ -61,9 +44,7 @@ function RegisterForm() {
         );
     }
 
-    function submit(e: SyntheticEvent) {
-        e.preventDefault();
-
+    function submit() {
         if (!passwordsMatch()) {
             setFormGlobalErrorData('Passwords do not match');
             return;
@@ -81,32 +62,14 @@ function RegisterForm() {
                 onSuccess: (data) => navigator('/login')
             }
         );
-
-        resetForm();
     }
 
     return (
-        <div className='register-form-wrapper'>
-
-            <h1>Register</h1>
-
-            <form className='register-form' onSubmit={ submit }>
-
-                { 
-                    Object.values(form).map((inputField, i) => {
-                        return <FormInput key={ i } model={ inputField } />
-                    })
-                }
-
-                <div className='register-form-global-error'>
-                    { formGlobalErrorData }
-                </div>
-
-                <button disabled={ !readyToSumbit() } className='register-form-submit' type="submit">Sign up</button>
-
-            </form>
-
-        </div>
+        <Form  
+            formTitle="Register" 
+            form={ form } 
+            submitCallback={ submit }
+            globalError={ formGlobalErrorData }/>
     );
 }
 
