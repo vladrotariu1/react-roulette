@@ -1,9 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FormInputDataModel, FormInputModel, UserModel } from "../../models";
 import { useLoginUser } from "../../services/auth.service";
+import { setAccessToken } from "../../services/localStorage.service";
+import { useAppState } from "../../state/stateContext";
+import { ACTION_SET_USER_LOGGED_IN } from "../../utils/constants";
 import Form from "../Form/Form";
 
 function LoginForm() {
+    const navigator = useNavigate();
+
+    const { dispatch } = useAppState();
     const { mutate: loginUser } = useLoginUser();
 
     const form = {
@@ -31,7 +38,12 @@ function LoginForm() {
 
         loginUser(userDataPayload, {
             onError: (error: any) => setFormGlobalErrorData(error.message),
-            onSuccess: async (data) => console.log(await data.json())
+            onSuccess: async (data) => {
+                const dataObject = await data.json();
+                setAccessToken(dataObject.access_token);
+                dispatch({ type: ACTION_SET_USER_LOGGED_IN , payload: true });
+                navigator('/');
+            }
         });
     }
 
