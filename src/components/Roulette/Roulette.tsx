@@ -72,8 +72,7 @@ function Roulette(props: RouletteProps) {
             }
             else if(velocity > 0.1) {
                 velocity *= friction;
-                friction -= 0.00006;
-                if (velocity < 3) friction -= 0.0006
+                friction -= velocity < 3 ? 0.00066 : 0.00006;
                 slotsContainer.style.left = offsetLeft + velocity + 'px';
             }
             else {
