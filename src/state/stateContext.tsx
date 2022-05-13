@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useReducer } from "react";
 import { useQuery } from "react-query";
 import { StateModel, UserDetailsModel } from "../models";
 import { useGetUserDetails } from "../services/user.service";
-import { ACTION_SET_USER, ACTION_SET_USER_LOGGED_IN } from "../utils/constants";
+import { ACTION_SET_USER } from "../utils/constants";
 import { reducer } from "./baseReducer";
 
 interface AppContext {
@@ -28,11 +28,10 @@ export default function StateProvider( { children }: any ) {
 
 	useEffect(() => {
         if (isSuccess) {
-            data.json()
-                .then((data: UserDetailsModel) => dispatch({ 
-                    type: ACTION_SET_USER,
-                    payload: data 
-                }));
+            dispatch({ 
+                type: ACTION_SET_USER,
+                payload: data 
+            });
         } else if (isError) {
             console.log('error getting user info');
         }
