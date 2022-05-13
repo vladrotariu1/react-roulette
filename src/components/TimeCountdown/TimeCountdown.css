@@ -1,5 +1,18 @@
+@keyframes glow {
+    from {
+        color: #fafafa;
+    }
+    to {
+        color: #fafafa73;
+    }
+}
+
 .time-countdown {
     color: #fafafa;
     font-size: 54px;
     font-family: sans-serif;
+}
+
+.time-countdown.preparing {
+    animation: glow 1s ease-in-out infinite alternate;
 }
