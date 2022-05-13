@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "react-query";
 import { TimeCountdownProps } from "../../models";
-import { useGetNextRoll } from "../../services/roulette.service";
+import { useGetNextRollTime } from "../../services/roulette.service";
 import { COUNTDOWN_TIME, Modes } from "../../utils/constants";
 import './TimeCountdown.css'
 
 function TimeCountdown(props: TimeCountdownProps) {
-    const { data: nextRollTimeObject } = useQuery('next-roll', useGetNextRoll(), { enabled: props.shouldRollOrCountDown === Modes.MODE_COUNT_DOWN });
+    const { data: nextRollTimeObject } = useQuery('next-roll/time', useGetNextRollTime(), { enabled: props.shouldRollOrCountDown === Modes.MODE_COUNT_DOWN });
 
     const [timeData, setTimeData] = useState(COUNTDOWN_TIME);
 
@@ -32,7 +32,7 @@ function TimeCountdown(props: TimeCountdownProps) {
     }
 
     function resetTime() {
-        const nextRollTime = nextRollTimeObject?.nextRoll;
+        const nextRollTime = nextRollTimeObject?.nextRollTime;
 
         if (nextRollTime)
             setTimeData(Math.floor(nextRollTime));

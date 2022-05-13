@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useEffect, useReducer } from "react";
 import { useQuery } from "react-query";
 import { StateModel, UserDetailsModel } from "../models";
+import { useGetRouletteDetails } from "../services/roulette.service";
 import { useGetUserDetails } from "../services/user.service";
-import { ACTION_SET_USER } from "../utils/constants";
+import { ACTION_SET_ROULETTE_DETAILS, ACTION_SET_USER } from "../utils/constants";
 import { reducer } from "./baseReducer";
 
 interface AppContext {
@@ -22,20 +23,45 @@ export function useAppState() {
 export default function StateProvider( { children }: any ) {
     const [state, dispatch] = useReducer(reducer, {} as StateModel);
 
-    const { isError, data, isSuccess } = useQuery('user-info', useGetUserDetails(), { 
+    const { 
+        isError: userInfoError, 
+        data: userInfoData, 
+        isSuccess: userInfoSuccess
+    } = useQuery('user-info', useGetUserDetails(), { 
         enabled: !!state.userLoggedIn 
     });
 
+    const { 
+        isError: rouletteDetailsError, 
+        data: rouletteDetailsData, 
+        isSuccess: rouletteDetailsSuccess
+    } = useQuery('roulette-props', useGetRouletteDetails(), {
+        enabled: true
+    });
+
 	useEffect(() => {
-        if (isSuccess) {
+        if (userInfoSuccess) {
             dispatch({ 
                 type: ACTION_SET_USER,
-                payload: data 
+                payload: userInfoData 
             });
-        } else if (isError) {
+        } else if (userInfoError) {
             console.log('error getting user info');
         }
-	}, [isError, isSuccess]);
+	}, [userInfoError, userInfoSuccess]);
+
+    useEffect(() => {
+        console.log('getting roulette details');
+        if (rouletteDetailsSuccess) {
+            console.log(rouletteDetailsData);
+            dispatch({ 
+                type: ACTION_SET_ROULETTE_DETAILS,
+                payload: rouletteDetailsData 
+            });
+        } else if (rouletteDetailsError) {
+            console.log('error getting roulette details');
+        }
+    }, [rouletteDetailsSuccess, rouletteDetailsError])
 
     return (
         <StateContext.Provider value={ { state, dispatch } }>

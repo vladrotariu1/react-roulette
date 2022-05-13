@@ -1,5 +1,6 @@
 import { StateModel } from "../models";
-import { ACTION_SET_USER, ACTION_SET_USER_LOGGED_IN } from "../utils/constants";
+import { ACTION_SET_ROULETTE_DETAILS, ACTION_SET_USER, ACTION_SET_USER_LOGGED_IN } from "../utils/constants";
+import { setRouletteDetailsReducer } from "./reducers/setRouletteDetails";
 import { setUserReducer } from "./reducers/setUser";
 import { setUserLoggedInReducer } from "./reducers/setUserLoggedIn";
 
@@ -16,6 +17,10 @@ const reducerDictionaryArray: ReducerDictionary[] = [
     {
         action: ACTION_SET_USER_LOGGED_IN,
         reducer: setUserLoggedInReducer
+    },
+    {
+        action: ACTION_SET_ROULETTE_DETAILS,
+        reducer: setRouletteDetailsReducer
     }
 ]
 

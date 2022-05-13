@@ -22,3 +22,4 @@ export const LOCAL_STORAGE_ACCESS_TOKEN = 'accessToken';
 /* Reducer actions constants */
 export const ACTION_SET_USER = 'ACTION_SET_USER';
 export const ACTION_SET_USER_LOGGED_IN = 'ACTION_SET_USER_LOGGED_IN';
+export const ACTION_SET_ROULETTE_DETAILS = 'ACTION_SET_ROULETTE_DETAILS';
