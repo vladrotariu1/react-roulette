@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useQuery } from "react-query";
 import { RouletteProps } from "../../models";
+import { useGetNextRollAcceleration } from "../../services/roulette.service";
+import { useAppState } from "../../state/stateContext";
 import { 
     Modes,
-    SLOTS_MAX_SPEED, 
-    SLOTS_NUMBER, 
-    SLOTS_PX_WIDTH, 
     SLOTS_ROLL_ACCELERATION, 
     SLOTS_ROLL_FRICTION, 
     SLOTS_VIEWPORT_PX_WIDTH, 
@@ -13,6 +13,14 @@ import {
 import './Roulette.css';
 
 function Roulette(props: RouletteProps) {
+    const { data: nextRollAccelerationObject } = useQuery('next-roll/acceleration', useGetNextRollAcceleration(), { enabled: props.shouldRollOrCountDown === Modes.MODE_COUNT_DOWN });
+    const { state } = useAppState();
+
+    const {
+        slotsMaxSpeed: SLOTS_MAX_SPEED,
+        slotsNumber: SLOTS_NUMBER,
+        slotsPxWidth: SLOTS_PX_WIDTH
+    } = state.rouletteDetails;
 
     let slotsRef = useRef<any>();
     const [ slotsArrayData, setSlotsArrayData ] = useState(
@@ -39,7 +47,7 @@ function Roulette(props: RouletteProps) {
         const slotsContainer = slotsRef.current;
         const offsetLeft = slotsContainer.offsetLeft;
 
-        slotsContainer.style.left = offsetLeft - SLOTS_PX_WIDTH + 'px';
+        slotsContainer.style.left = Math.floor(offsetLeft - SLOTS_PX_WIDTH) + 'px';
 
         setSlotsArrayData(
             arr => [arr[arr.length - 1], ...arr.slice(0, arr.length - 1)]
@@ -47,43 +55,45 @@ function Roulette(props: RouletteProps) {
     }
 
     function roll() {
+        if (nextRollAccelerationObject?.nextRollAcceleration) {
+            console.log('should roll');
+            const slotsContainer = slotsRef.current;
 
-        const slotsContainer = slotsRef.current;
+            let velocity = 0;
+            const acceleration = SLOTS_ROLL_ACCELERATION;
+            let friction = SLOTS_ROLL_FRICTION;
+            let accelerationTime = nextRollAccelerationObject.nextRollAcceleration;
+            let time = 0;
+            
+            const stopAnimation = () => {
+                props.setWinnerSlotColor(val => slotsRollResult());
+                props.setModeToCountDown();
+                clearInterval(rollAnimation);
+            }
+            
+            const rollAnimation = setInterval(() => {
 
-        let velocity = 0;
-        const acceleration = SLOTS_ROLL_ACCELERATION;
-        let friction = SLOTS_ROLL_FRICTION;
-        let accelerationTime = 200;
-        let time = 0;
-        
-        const stopAnimation = () => {
-            props.setWinnerSlotColor(val => slotsRollResult());
-            props.setModeToCountDown();
-            clearInterval(rollAnimation);
+                const offsetLeft = slotsContainer.offsetLeft;
+
+                if (time++ < accelerationTime) {
+                    velocity += velocity < SLOTS_MAX_SPEED ?  acceleration : 0;
+                    slotsContainer.style.left = Math.floor(offsetLeft + velocity) + 'px';
+                }
+                else if(velocity > 0.1) {
+                    velocity *= friction;
+                    friction -= velocity < 3 ? 0.00066 : 0.00006;
+                    slotsContainer.style.left = Math.floor(offsetLeft + velocity) + 'px';
+                }
+                else {
+                    stopAnimation();
+                }
+
+                if (offsetLeft > 0 - SLOTS_PX_WIDTH) {
+                    moveLastSlotToFront();
+                }
+
+            }, 1);
         }
-        
-        const rollAnimation = setInterval(() => {
-
-            const offsetLeft = slotsContainer.offsetLeft;
-
-            if (time++ < accelerationTime) {
-                velocity += velocity < SLOTS_MAX_SPEED ?  acceleration : 0;
-                slotsContainer.style.left = offsetLeft + velocity + 'px';
-            }
-            else if(velocity > 0.1) {
-                velocity *= friction;
-                friction -= velocity < 3 ? 0.00066 : 0.00006;
-                slotsContainer.style.left = offsetLeft + velocity + 'px';
-            }
-            else {
-                stopAnimation();
-            }
-
-            if (offsetLeft > 0 - SLOTS_PX_WIDTH) {
-                moveLastSlotToFront();
-            }
-
-        }, 1);
     }
 
     useEffect(() => {
