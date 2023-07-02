@@ -27,9 +27,9 @@ export function useGetNextRollTime() {
     return executeRequest;
 }
 
-export function useGetNextRollAcceleration() {
+export function useGetNextRollPositionsArray() {
 
-    const nextRollAccelerationEndpoint = endpoint + 'next-roll/acceleration/';
+    const nextRollAccelerationEndpoint = endpoint + 'next-roll/positions-array/';
     const request = {
         method: 'GET',
         headers: {
@@ -46,7 +46,7 @@ export function useGetNextRollAcceleration() {
                             throw Error(response.statusText);
                     }
                 }
-                return await response.json() as { nextRollAcceleration: number };
+                return await response.json() as [];
             });
 
     return executeRequest;

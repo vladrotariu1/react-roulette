@@ -1,38 +1,38 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useQuery } from "react-query";
 import { RouletteProps } from "../../models";
-import { useGetNextRollAcceleration } from "../../services/roulette.service";
+import { useGetNextRollPositionsArray } from "../../services/roulette.service";
 import { useAppState } from "../../state/stateContext";
-import { 
-    Modes,
-    SLOTS_ROLL_ACCELERATION, 
-    SLOTS_ROLL_FRICTION, 
-    SLOTS_VIEWPORT_PX_WIDTH, 
-    SLOT_COLOR_BLACK, 
-    SLOT_COLOR_RED } from "../../utils/constants";
+import {Modes, SLOTS_VIEWPORT_PX_WIDTH} from "../../utils/constants";
 import './Roulette.css';
 
 function Roulette(props: RouletteProps) {
-    const { data: nextRollAccelerationObject } = useQuery('next-roll/acceleration', useGetNextRollAcceleration(), { enabled: props.shouldRollOrCountDown === Modes.MODE_COUNT_DOWN });
+    const { data: nextRollPositionsArray } = useQuery(
+        'next-roll/positions-array',
+        useGetNextRollPositionsArray(),
+        { enabled: props.shouldRollOrCountDown === Modes.MODE_COUNT_DOWN }
+    );
     const { state } = useAppState();
 
     const {
-        slotsMaxSpeed: SLOTS_MAX_SPEED,
         slotsNumber: SLOTS_NUMBER,
-        slotsPxWidth: SLOTS_PX_WIDTH
+        slotsPxWidth: SLOTS_PX_WIDTH,
+        rouletteOffsetLeft: INITIAL_OFFSET,
+        slots: initialSlots,
     } = state.rouletteDetails;
 
     let slotsRef = useRef<any>();
     const [ slotsArrayData, setSlotsArrayData ] = useState(
         [...Array(SLOTS_NUMBER).keys()]
-            .map(index => 
-                <div 
-                    key={ index }
-                    color={ index % 2 === 0 ? SLOT_COLOR_RED : SLOT_COLOR_BLACK }
-                    className={ 'slot ' + (index % 2 === 0 ? 'slot-red' : 'slot-black') }>
-                    { index }
-                </div>
-            )
+            .map(index =>{
+                const currentSlot = initialSlots[index];
+                return (<div
+                    key={ currentSlot.number }
+                    color={ currentSlot.color }
+                    className={ 'slot ' + (currentSlot.number % 2 === 0 ? 'slot-red' : 'slot-black') }>
+                    { currentSlot.number }
+                </div>)
+            })
     );
 
     function slotsRollResult(): string {
@@ -55,43 +55,26 @@ function Roulette(props: RouletteProps) {
     }
 
     function roll() {
-        if (nextRollAccelerationObject?.nextRollAcceleration) {
-            console.log('should roll');
+        if (nextRollPositionsArray) {
             const slotsContainer = slotsRef.current;
+            let positionArrayCurrentIndex = 0;
 
-            let velocity = 0;
-            const acceleration = SLOTS_ROLL_ACCELERATION;
-            let friction = SLOTS_ROLL_FRICTION;
-            let accelerationTime = nextRollAccelerationObject.nextRollAcceleration;
-            let time = 0;
-            
             const stopAnimation = () => {
-                props.setWinnerSlotColor(val => slotsRollResult());
+                props.setWinnerSlotColor(() => slotsRollResult());
                 props.setModeToCountDown();
                 clearInterval(rollAnimation);
             }
             
             const rollAnimation = setInterval(() => {
-
-                const offsetLeft = slotsContainer.offsetLeft;
-
-                if (time++ < accelerationTime) {
-                    velocity += velocity < SLOTS_MAX_SPEED ?  acceleration : 0;
-                    slotsContainer.style.left = Math.floor(offsetLeft + velocity) + 'px';
-                }
-                else if(velocity > 0.1) {
-                    velocity *= friction;
-                    friction -= velocity < 3 ? 0.00066 : 0.00006;
-                    slotsContainer.style.left = Math.floor(offsetLeft + velocity) + 'px';
-                }
-                else {
-                    stopAnimation();
-                }
-
-                if (offsetLeft > 0 - SLOTS_PX_WIDTH) {
+                if (positionArrayCurrentIndex > 0 &&
+                    nextRollPositionsArray[positionArrayCurrentIndex] < nextRollPositionsArray[positionArrayCurrentIndex - 1]) {
                     moveLastSlotToFront();
                 }
 
+                slotsContainer.style.left = nextRollPositionsArray[positionArrayCurrentIndex] + 'px';
+                positionArrayCurrentIndex++;
+
+                if (positionArrayCurrentIndex >= nextRollPositionsArray.length) stopAnimation();
             }, 1);
         }
     }
@@ -105,7 +88,7 @@ function Roulette(props: RouletteProps) {
     return (
         <div>
             <div className='slots-container-viewport'>
-                <div ref={ slotsRef } className='slots-container'>
+                <div style={{ left: INITIAL_OFFSET + 'px' }} ref={ slotsRef } className='slots-container'>
                     { slotsArrayData }
                 </div>
             </div>

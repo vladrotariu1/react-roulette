@@ -1,3 +1,5 @@
+import {Slot} from "./Slot.model";
+
 export interface RouletteDetailsModel {
     slotsNumber: number,
     slotsPxWidth: number,
@@ -5,4 +7,6 @@ export interface RouletteDetailsModel {
     slotsRollFriction: number,
     slotsMaxSpeed: number,
     slotsViewportPxWidth: number,
+    rouletteOffsetLeft: number,
+    slots: Slot[],
 }

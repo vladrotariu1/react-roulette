@@ -6,3 +6,4 @@ export * from './User.model';
 export * from './Form.props.model';
 export * from './UserDetails.model';
 export * from './State.model';
+export * from './Slot.model';
